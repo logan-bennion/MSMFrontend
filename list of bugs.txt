@@ -1,0 +1,4 @@
+Images are not loading properly. 
+The delete and clear all features in the wishlist and cart are not working. 
+We need to navigate to the homepage after placing the order and completing payment. 
+We need to implement Payment & Checkout pages properly. 
