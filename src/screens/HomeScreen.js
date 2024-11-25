@@ -272,13 +272,16 @@ const HomeScreen = ({ navigation }) => {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.dealsContainer}
             >
-              {deals.map(deal => (
-                <DealCard 
-                  key={deal.id} 
-                  deal={deal} 
-                  onPress={() => navigation.navigate('Product', { product: deal })}
-                />
-              ))}
+            {deals.map(deal => (
+              <DealCard 
+                key={deal.id} 
+                deal={deal} 
+                onPress={() => navigation.navigate('Product', { 
+                  productId: deal.id,    // Changed from id to deal.id
+                  title: deal.name       // Changed from name to deal.name
+                })}
+              />
+            ))}
             </ScrollView>
           )}
         </View>

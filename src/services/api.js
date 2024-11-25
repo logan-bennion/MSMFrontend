@@ -1,15 +1,76 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = 'http://localhost:8000/api';
+import axios from 'axios';
 
-const getHeaders = async () => {
-    // For development/testing, return empty headers
-    return {
+const API_URL = 'http://localhost:8000';
+
+// Create axios instance with base configuration
+const api = axios.create({
+    baseURL: API_URL,
+    headers: {
         'Content-Type': 'application/json',
-        // 'Authorization': token ? `Bearer ${token}` : '', // Commented out for testing
-    };
+    },
+});
+
+// Test connection function
+export const testBackendConnection = async () => {
+    try {
+        const response = await api.get('/api/test-connection/');
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
 };
 
+// Request interceptor for debugging
+api.interceptors.request.use(request => {
+    console.log('Request URL:', request.baseURL + request.url);
+    return request;
+});
+
+// Cart API functions
+export const cartAPI = {
+    // Get user's cart
+    getCart: async () => {
+        const response = await api.get('/api/cart/');
+        return response.data;
+    },
+
+    // Add item to cart
+    addToCart: async (productId, quantity = 1) => {
+        try {
+          const response = await api.post('/api/cart/add_item/', {
+            product_id: productId,  // Make sure we're sending just the ID
+            quantity: quantity
+          });
+          return response.data;
+        } catch (error) {
+            console.error('API Error:', error.response?.data || error.message);
+            throw error;
+        }
+      },
+
+    // Remove item from cart
+    removeFromCart: async (productId) => {
+        const response = await api.post('/api/cart/remove_item/', {
+            product_id: productId
+        });
+        return response.data;
+    },
+
+    // Update cart item quantity
+    updateQuantity: async (productId, quantity) => {
+        // First remove then add with new quantity
+        await api.post('/api/cart/remove_item/', { product_id: productId });
+        const response = await api.post('/api/cart/add_item/', {
+            product_id: productId,
+            quantity: quantity
+        });
+        return response.data;
+    }
+};
+
+/*
 export const api = {
     // Auth endpoints
     login: async (credentials) => {
@@ -66,3 +127,4 @@ export const api = {
         return response.json();
     },
 };
+*/

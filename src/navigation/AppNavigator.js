@@ -13,6 +13,7 @@ import ProfileScreen from '../screens/ProfileScreen';
 import ShopScreen from '../screens/ShopScreen';
 import ProductScreen from '../screens/ProductScreen';
 import CheckoutScreen from '../screens/CheckoutScreen';
+import { useProducts } from '../context/ProductContext';
 
 
 const Tab = createBottomTabNavigator();
@@ -81,74 +82,78 @@ const MainTabs = () => (
 );
 
 // Main stack navigator that wraps the tab navigator
-const AppNavigator = () => (
+const AppNavigator = () => {
+  const { selectedProduct } = useProducts();
+
+  return(
   <Stack.Navigator>
-    <Stack.Screen 
-      name="MainTabs" 
-      component={MainTabs} 
-      options={{ headerShown: false }}
-    />
-    
-    <Stack.Screen 
-      name="Shop" 
-      component={ShopScreen}
-      options={({ route }) => ({
-        title: route.params?.shop?.name || 'Shop Details',
-        headerBackTitleVisible: false,
-        headerStyle: {
-          backgroundColor: '#fff',
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 1,
-          borderBottomColor: '#eee',
-        },
-        headerTitleStyle: {
-          fontSize: 18,
-          fontWeight: '600',
-        },
-      })}
-    />
+      <Stack.Screen 
+        name="MainTabs" 
+        component={MainTabs} 
+        options={{ headerShown: false }}
+      />
+      
+      <Stack.Screen 
+        name="Shop" 
+        component={ShopScreen}
+        options={({ route }) => ({
+          title: route.params?.shop?.name || 'Shop Details',
+          headerBackTitleVisible: false,
+          headerStyle: {
+            backgroundColor: '#fff',
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 1,
+            borderBottomColor: '#eee',
+          },
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: '600',
+          },
+        })}
+      />
 
-    <Stack.Screen 
-      name="Product" 
-      component={ProductScreen}
-      options={({ route }) => ({
-        title: route.params?.product?.name || 'Product Details',
-        headerBackTitleVisible: false,
-        headerStyle: {
-          backgroundColor: '#fff',
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 1,
-          borderBottomColor: '#eee',
-        },
-        headerTitleStyle: {
-          fontSize: 18,
-          fontWeight: '600',
-        },
-      })}
-    />
+      <Stack.Screen 
+        name="Product" 
+        component={ProductScreen}
+        options={({ route }) => ({
+          title: selectedProduct?.name || route.params?.title || 'Product Details',
+          headerBackTitleVisible: false,
+          headerStyle: {
+            backgroundColor: '#fff',
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 1,
+            borderBottomColor: '#eee',
+          },
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: '600',
+          },
+        })}
+      />
 
-    <Stack.Screen 
-      name="Checkout" 
-      component={CheckoutScreen}
-      options={{
-        title: 'Checkout',
-        headerBackTitleVisible: false,
-        headerStyle: {
-          backgroundColor: '#fff',
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 1,
-          borderBottomColor: '#eee',
-        },
-        headerTitleStyle: {
-          fontSize: 18,
-          fontWeight: '600',
-        },
-      }}
-    />
-  </Stack.Navigator>
-);
+      <Stack.Screen 
+        name="Checkout" 
+        component={CheckoutScreen}
+        options={{
+          title: 'Checkout',
+          headerBackTitleVisible: false,
+          headerStyle: {
+            backgroundColor: '#fff',
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 1,
+            borderBottomColor: '#eee',
+          },
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: '600',
+          },
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
 
 export default AppNavigator;

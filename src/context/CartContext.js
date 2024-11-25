@@ -2,10 +2,123 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
+import { cartAPI } from '../services/api';
 
 const CartContext = createContext();
-const CART_STORAGE_KEY = '@mainstreet_markets_cart';
+//const CART_STORAGE_KEY = '@mainstreet_markets_cart';
 
+export const CartProvider = ({ children }) => {
+  const [cart, setCart] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchCart = async () => {
+      try {
+          setLoading(true);
+          const cartData = await cartAPI.getCart();
+          setCart(cartData);
+          setError(null);
+      } catch (err) {
+          console.error('Error fetching cart:', err);
+          setError('Failed to fetch cart');
+          // Initialize empty cart for development
+          setCart({ items: [], total: 0 });
+      } finally {
+          setLoading(false);
+      }
+  };
+
+  const addToCart = async (productId, quantity = 1) => {
+    try {
+        setLoading(true);
+        console.log('CartContext: Adding to cart:', { productId, quantity });
+        const updatedCart = await cartAPI.addToCart(productId, quantity);
+        setCart(updatedCart);
+        setError(null);
+        return true;
+    } catch (err) {
+        console.error('CartContext: Error adding to cart:', err);
+        setError('Failed to add item to cart');
+        Alert.alert(
+            'Error',
+            'Failed to add item to cart. Please try again.'
+        );
+        return false;
+    } finally {
+        setLoading(false);
+    }
+  };
+
+  const removeFromCart = async (productId) => {
+      try {
+          setLoading(true);
+          await cartAPI.removeFromCart(productId);
+          await fetchCart(); // Refresh cart after removal
+          setError(null);
+          return true;
+      } catch (err) {
+          console.error('Error removing from cart:', err);
+          setError('Failed to remove item from cart');
+          return false;
+      } finally {
+          setLoading(false);
+      }
+  };
+
+  const updateQuantity = async (productId, quantity) => {
+      try {
+          setLoading(true);
+          const updatedCart = await cartAPI.updateQuantity(productId, quantity);
+          setCart(updatedCart);
+          setError(null);
+          return true;
+      } catch (err) {
+          console.error('Error updating quantity:', err);
+          setError('Failed to update quantity');
+          return false;
+      } finally {
+          setLoading(false);
+      }
+  };
+
+  // For development - clear any API errors and reset cart
+  const clearError = () => {
+      setError(null);
+  };
+
+  // For development - reset cart to empty state
+  const clearCart = () => {
+      setCart({ items: [], total: 0 });
+  };
+
+  return (
+      <CartContext.Provider
+          value={{
+              cart,
+              loading,
+              error,
+              addToCart,
+              removeFromCart,
+              updateQuantity,
+              refreshCart: fetchCart,
+              clearError,     // Development helper
+              clearCart,      // Development helper
+          }}
+      >
+          {children}
+      </CartContext.Provider>
+  );
+};
+
+export const useCart = () => {
+  const context = useContext(CartContext);
+  if (!context) {
+    throw new Error('useCart must be used within a CartProvider');
+  }
+  return context;
+};
+
+/*
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -163,11 +276,4 @@ export const CartProvider = ({ children }) => {
     </CartContext.Provider>
   );
 };
-
-export const useCart = () => {
-  const context = useContext(CartContext);
-  if (!context) {
-    throw new Error('useCart must be used within a CartProvider');
-  }
-  return context;
-};
+*/

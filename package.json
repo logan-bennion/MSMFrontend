@@ -2,6 +2,7 @@
   "name": "mainstreet-markets",
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
+  "proxy": "http://localhost:8000",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -30,4 +31,5 @@
     "@babel/core": "^7.20.0"
   },
   "private": true
+  
 }

@@ -35,6 +35,10 @@ import { WishlistProvider } from './src/context/WishlistContext';
 import { CartProvider } from './src/context/CartContext';
 import { UserProvider } from './src/context/UserContext';
 import { AuthProvider } from './src/context/AuthContext';
+import { ProductProvider } from './src/context/ProductContext';
+import { useProducts } from './src/context/ProductContext';
+
+import TestConnection from './src/components/common/TestConnection';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -114,321 +118,330 @@ const TabNavigator = () => (
   </Tab.Navigator>
 );
 
-const RootStack = () => (
-  <Stack.Navigator>
-    <Stack.Screen 
-      name="MainTabs" 
-      component={TabNavigator} 
-      options={{ headerShown: false }}
-    />
-    <Stack.Screen 
-      name="Product" 
-      component={ProductScreen}
-      options={({ route }) => ({
-        title: route.params?.product?.name || 'Product Details',
-        headerBackTitleVisible: false,
-        headerStyle: {
-          backgroundColor: '#fff',
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 1,
-          borderBottomColor: '#eee',
-        },
-      })}
-    />
-    <Stack.Screen 
-      name="Checkout" 
-      component={CheckoutScreen}
-      options={{ headerShown: false }}
-    />
-    {/* Add EditProfile Screen */}
-    <Stack.Screen 
-      name="EditProfile" 
-      component={EditProfileScreen}
-      options={{
-        title: 'Edit Profile',
-        headerBackTitleVisible: false,
-        headerStyle: {
-          backgroundColor: '#fff',
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 1,
-          borderBottomColor: '#eee',
-        },
-        headerTitleStyle: {
-          fontSize: 18,
-          fontWeight: '600',
-        },
-      }}
-    />
-        <Stack.Screen 
-      name="OrderHistory" 
-      component={OrderHistoryScreen}
-      options={{
-        title: 'Order History',
-        headerBackTitleVisible: false,
-        headerStyle: {
-          backgroundColor: '#fff',
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 1,
-          borderBottomColor: '#eee',
-        },
-        headerTitleStyle: {
-          fontSize: 18,
-          fontWeight: '600',
-        },
-      }}
-    />
+const RootStack = () => {
+  const { selectedProduct } = useProducts(); 
 
-        <Stack.Screen 
-      name="OrderDetails" 
-      component={OrderDetailsScreen}
-      options={{
-        title: 'Order Details',
-        headerBackTitleVisible: false,
-        headerStyle: {
-          backgroundColor: '#fff',
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 1,
-          borderBottomColor: '#eee',
-        },
-        headerTitleStyle: {
-          fontSize: 18,
-          fontWeight: '600',
-        },
-      }}
-    />
-    <Stack.Screen 
-      name="LeaveReview" 
-      component={LeaveReviewScreen}
-      options={{
-        title: 'Write a Review',
-        headerBackTitleVisible: false,
-        headerStyle: {
-          backgroundColor: '#fff',
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 1,
-          borderBottomColor: '#eee',
-        },
-        headerTitleStyle: {
-          fontSize: 18,
-          fontWeight: '600',
-        },
-      }}
-    />
+  return (
+    <Stack.Navigator>
+      <Stack.Screen 
+        name="MainTabs" 
+        component={TabNavigator} 
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen 
+        name="Product" 
+        component={ProductScreen}
+        options={({ route }) => ({
+          title: selectedProduct?.name || route.params?.product?.name || 'Product Details',
+          headerBackTitleVisible: false,
+          headerStyle: {
+            backgroundColor: '#fff',
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 1,
+            borderBottomColor: '#eee',
+          },
+        })}
+      />
+      <Stack.Screen 
+        name="Checkout" 
+        component={CheckoutScreen}
+        options={{ headerShown: false }}
+      />
+      {/* Add EditProfile Screen */}
+      <Stack.Screen 
+        name="EditProfile" 
+        component={EditProfileScreen}
+        options={{
+          title: 'Edit Profile',
+          headerBackTitleVisible: false,
+          headerStyle: {
+            backgroundColor: '#fff',
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 1,
+            borderBottomColor: '#eee',
+          },
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: '600',
+          },
+        }}
+      />
+          <Stack.Screen 
+        name="OrderHistory" 
+        component={OrderHistoryScreen}
+        options={{
+          title: 'Order History',
+          headerBackTitleVisible: false,
+          headerStyle: {
+            backgroundColor: '#fff',
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 1,
+            borderBottomColor: '#eee',
+          },
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: '600',
+          },
+        }}
+      />
 
-    <Stack.Screen 
-      name="TrackOrder" 
-      component={TrackOrderScreen}
-      options={{
-        title: 'Track Order',
-        headerBackTitleVisible: false,
-        headerStyle: {
-          backgroundColor: '#fff',
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 1,
-          borderBottomColor: '#eee',
-        },
-        headerTitleStyle: {
-          fontSize: 18,
-          fontWeight: '600',
-        },
-      }}
-    />
+          <Stack.Screen 
+        name="OrderDetails" 
+        component={OrderDetailsScreen}
+        options={{
+          title: 'Order Details',
+          headerBackTitleVisible: false,
+          headerStyle: {
+            backgroundColor: '#fff',
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 1,
+            borderBottomColor: '#eee',
+          },
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: '600',
+          },
+        }}
+      />
+      <Stack.Screen 
+        name="LeaveReview" 
+        component={LeaveReviewScreen}
+        options={{
+          title: 'Write a Review',
+          headerBackTitleVisible: false,
+          headerStyle: {
+            backgroundColor: '#fff',
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 1,
+            borderBottomColor: '#eee',
+          },
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: '600',
+          },
+        }}
+      />
 
-        <Stack.Screen 
-      name="Addresses" 
-      component={ShippingAddressesScreen}
-      options={{
-        title: 'Shipping Addresses',
-        headerBackTitleVisible: false,
-        headerStyle: {
-          backgroundColor: '#fff',
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 1,
-          borderBottomColor: '#eee',
-        },
-        headerTitleStyle: {
-          fontSize: 18,
-          fontWeight: '600',
-        },
-      }}
-    />
+      <Stack.Screen 
+        name="TrackOrder" 
+        component={TrackOrderScreen}
+        options={{
+          title: 'Track Order',
+          headerBackTitleVisible: false,
+          headerStyle: {
+            backgroundColor: '#fff',
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 1,
+            borderBottomColor: '#eee',
+          },
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: '600',
+          },
+        }}
+      />
 
-        <Stack.Screen 
-      name="EditAddress" 
-      component={EditShippingAddressScreen}
-      options={{
-        title: 'Edit Shipping Address',
-        headerBackTitleVisible: false,
-        headerStyle: {
-          backgroundColor: '#fff',
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 1,
-          borderBottomColor: '#eee',
-        },
-        headerTitleStyle: {
-          fontSize: 18,
-          fontWeight: '600',
-        },
-      }}
-    />
+          <Stack.Screen 
+        name="Addresses" 
+        component={ShippingAddressesScreen}
+        options={{
+          title: 'Shipping Addresses',
+          headerBackTitleVisible: false,
+          headerStyle: {
+            backgroundColor: '#fff',
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 1,
+            borderBottomColor: '#eee',
+          },
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: '600',
+          },
+        }}
+      />
 
-        <Stack.Screen 
-      name="AddAddress" 
-      component={AddShippingAddressScreen}
-      options={{
-        title: 'Add New Address',
-        headerBackTitleVisible: false,
-        headerStyle: {
-          backgroundColor: '#fff',
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 1,
-          borderBottomColor: '#eee',
-        },
-        headerTitleStyle: {
-          fontSize: 18,
-          fontWeight: '600',
-        },
-      }}
-    />
+          <Stack.Screen 
+        name="EditAddress" 
+        component={EditShippingAddressScreen}
+        options={{
+          title: 'Edit Shipping Address',
+          headerBackTitleVisible: false,
+          headerStyle: {
+            backgroundColor: '#fff',
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 1,
+            borderBottomColor: '#eee',
+          },
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: '600',
+          },
+        }}
+      />
 
-    <Stack.Screen 
-      name="PaymentMethods" 
-      component={PaymentMethodsScreen}
-      options={{
-        title: 'Payment Methods',
-        headerBackTitleVisible: false,
-        headerStyle: {
-          backgroundColor: '#fff',
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 1,
-          borderBottomColor: '#eee',
-        },
-        headerTitleStyle: {
-          fontSize: 18,
-          fontWeight: '600',
-        },
-    }}
-    />
-    <Stack.Screen 
-      name="AddPaymentMethod" 
-      component={AddPaymentMethodScreen}
-      options={{
-        title: 'Add Payment Method',
-        headerBackTitleVisible: false,
-        headerStyle: {
-          backgroundColor: '#fff',
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 1,
-          borderBottomColor: '#eee',
-        },
-        headerTitleStyle: {
-          fontSize: 18,
-          fontWeight: '600',
-        },
-      }}
-/>
-    <Stack.Screen 
-      name="Support" 
-      component={SupportScreen}
-      options={{
-        title: 'Help & Support',
-        headerBackTitleVisible: false,
-        headerStyle: {
-          backgroundColor: '#fff',
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 1,
-          borderBottomColor: '#eee',
-        },
-        headerTitleStyle: {
-          fontSize: 18,
-          fontWeight: '600',
-        },
-      }}
-    />
+          <Stack.Screen 
+        name="AddAddress" 
+        component={AddShippingAddressScreen}
+        options={{
+          title: 'Add New Address',
+          headerBackTitleVisible: false,
+          headerStyle: {
+            backgroundColor: '#fff',
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 1,
+            borderBottomColor: '#eee',
+          },
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: '600',
+          },
+        }}
+      />
 
-    <Stack.Screen 
-      name="Terms" 
-      component={TermsScreen}
-      options={{
-        title: 'Terms & Conditions',
-        headerBackTitleVisible: false,
-        headerStyle: {
-          backgroundColor: '#fff',
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 1,
-          borderBottomColor: '#eee',
-        },
-        headerTitleStyle: {
-          fontSize: 18,
-          fontWeight: '600',
-        },
+      <Stack.Screen 
+        name="PaymentMethods" 
+        component={PaymentMethodsScreen}
+        options={{
+          title: 'Payment Methods',
+          headerBackTitleVisible: false,
+          headerStyle: {
+            backgroundColor: '#fff',
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 1,
+            borderBottomColor: '#eee',
+          },
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: '600',
+          },
       }}
-    />
+      />
+      <Stack.Screen 
+        name="AddPaymentMethod" 
+        component={AddPaymentMethodScreen}
+        options={{
+          title: 'Add Payment Method',
+          headerBackTitleVisible: false,
+          headerStyle: {
+            backgroundColor: '#fff',
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 1,
+            borderBottomColor: '#eee',
+          },
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: '600',
+          },
+        }}
+  />
+      <Stack.Screen 
+        name="Support" 
+        component={SupportScreen}
+        options={{
+          title: 'Help & Support',
+          headerBackTitleVisible: false,
+          headerStyle: {
+            backgroundColor: '#fff',
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 1,
+            borderBottomColor: '#eee',
+          },
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: '600',
+          },
+        }}
+      />
 
-    <Stack.Screen 
-      name="Privacy" 
-      component={PrivacyScreen}
-      options={{
-        title: 'Privacy Policy',
-        headerBackTitleVisible: false,
-        headerStyle: {
-          backgroundColor: '#fff',
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 1,
-          borderBottomColor: '#eee',
-        },
-        headerTitleStyle: {
-          fontSize: 18,
-          fontWeight: '600',
-        },
-      }}
-    />
+      <Stack.Screen 
+        name="Terms" 
+        component={TermsScreen}
+        options={{
+          title: 'Terms & Conditions',
+          headerBackTitleVisible: false,
+          headerStyle: {
+            backgroundColor: '#fff',
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 1,
+            borderBottomColor: '#eee',
+          },
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: '600',
+          },
+        }}
+      />
 
-    <Stack.Screen 
-      name="About" 
-      component={AboutScreen}
-      options={{
-        title: 'About Us',
-        headerBackTitleVisible: false,
-        headerStyle: {
-          backgroundColor: '#fff',
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 1,
-          borderBottomColor: '#eee',
-        },
-        headerTitleStyle: {
-          fontSize: 18,
-          fontWeight: '600',
-        },
-      }}
-    />
-  </Stack.Navigator>
-  
-);
+      <Stack.Screen 
+        name="Privacy" 
+        component={PrivacyScreen}
+        options={{
+          title: 'Privacy Policy',
+          headerBackTitleVisible: false,
+          headerStyle: {
+            backgroundColor: '#fff',
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 1,
+            borderBottomColor: '#eee',
+          },
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: '600',
+          },
+        }}
+      />
+
+      <Stack.Screen 
+        name="About" 
+        component={AboutScreen}
+        options={{
+          title: 'About Us',
+          headerBackTitleVisible: false,
+          headerStyle: {
+            backgroundColor: '#fff',
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 1,
+            borderBottomColor: '#eee',
+          },
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: '600',
+          },
+        }}
+      />
+    </Stack.Navigator>
+    
+  );
+}
 
 export default function App() {
   return (
     <AuthProvider>
+    <div>
+      <TestConnection />
+    </div>
       <NavigationContainer>
         <UserProvider>  {/* Add this */}
           <WishlistProvider>
             <CartProvider>
-              <RootStack />
+              <ProductProvider>
+                <RootStack />
+              </ProductProvider>
             </CartProvider>
           </WishlistProvider>
         </UserProvider>  {/* Add this */}

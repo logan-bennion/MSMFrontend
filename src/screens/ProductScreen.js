@@ -1,5 +1,5 @@
 // src/screens/ProductScreen.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,69 +8,111 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Dimensions,
-  Alert
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useWishlist } from '../context/WishlistContext';
 import { useCart } from '../context/CartContext';
+import { useProducts } from '../context/ProductContext';
 
 const { width } = Dimensions.get('window');
-
-// Define mock data at the top level
-const mockProduct = {
-  id: 1,
-  name: "Wireless Noise-Canceling Earbuds with Charging Case",
-  shopName: "Bob's Electronics",
-  price: 79.99,
-  originalPrice: 129.99,
-  discount: 38,
-  rating: 4.8,
-  reviews: 254,
-  description: "Experience premium sound quality with our latest wireless earbuds. Featuring active noise cancellation, touch controls, and up to 24 hours of battery life with the charging case.",
-  sizes: ['One Size'],
-};
 
 const ProductScreen = ({ route, navigation }) => {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { selectedProduct, loading, error, fetchProductById } = useProducts();
+  
   const [selectedSize, setSelectedSize] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const product = route.params?.product || mockProduct;
-  const inWishlist = isInWishlist(product.id);
+  
+  // Get the product ID from navigation params
+  const productId = route.params?.productId;
+
+  // Fetch product details when component mounts
+  useEffect(() => {
+    if (productId) {
+      fetchProductById(productId);
+    }
+  }, [productId]);
+
+  // Show loading state
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#007AFF" />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>Error loading product: {error}</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // If no product is loaded
+  if (!selectedProduct) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>Product not found</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  const inWishlist = isInWishlist(selectedProduct.id);
 
   const handleWishlist = () => {
     if (inWishlist) {
-      removeFromWishlist(product.id);
+      removeFromWishlist(selectedProduct.id);
     } else {
-      addToWishlist(product);
+      addToWishlist(selectedProduct);
     }
   };
 
   const handleAddToCart = () => {
-    if (product.sizes && !selectedSize) {
+    if (selectedProduct.sizes && !selectedSize) {
       Alert.alert('Please Select Size', 'You must select a size before adding to cart');
       return;
     }
 
-    addToCart(product, quantity, selectedSize);
-    Alert.alert(
-      'Added to Cart',
-      'Item successfully added to cart',
-      [
-        {
-          text: 'Continue Shopping',
-          style: 'cancel',
-        },
-        {
-          text: 'View Cart',
-          onPress: () => navigation.navigate('Cart'),
-        },
-      ]
-    );
+    addToCart(selectedProduct.id, quantity)
+      .then(() => {
+        Alert.alert(
+          'Added to Cart',
+          'Item successfully added to cart',
+          [
+            {
+              text: 'Continue Shopping',
+              style: 'cancel',
+            },
+            {
+              text: 'View Cart',
+              onPress: () => navigation.navigate('Cart'),
+            },
+          ]
+        );
+      })
+      .catch(error => {
+        console.error('Error adding to cart:', error);
+        Alert.alert(
+          'Error',
+          'Failed to add item to cart. Please try again.'
+        );
+      });
   };
 
   const handleBuyNow = () => {
-    if (product.sizes && !selectedSize) {
+    if (selectedProduct.sizes && !selectedSize) {
       Alert.alert('Please Select Size', 'You must select a size before proceeding');
       return;
     }
@@ -87,25 +129,25 @@ const ProductScreen = ({ route, navigation }) => {
         </View>
 
         <View style={styles.infoContainer}>
-          <Text style={styles.productName}>{product.name}</Text>
+          <Text style={styles.productName}>{selectedProduct.name}</Text>
           
           <View style={styles.priceContainer}>
-            <Text style={styles.price}>${product.price}</Text>
-            {product.originalPrice && (
-              <Text style={styles.originalPrice}>${product.originalPrice}</Text>
+            <Text style={styles.price}>${selectedProduct.price}</Text>
+            {selectedProduct.originalPrice && (
+              <Text style={styles.originalPrice}>${selectedProduct.originalPrice}</Text>
             )}
-            {product.discount && (
+            {selectedProduct.discount && (
               <View style={styles.discountBadge}>
-                <Text style={styles.discountText}>{product.discount}% OFF</Text>
+                <Text style={styles.discountText}>{selectedProduct.discount}% OFF</Text>
               </View>
             )}
           </View>
 
-          {product.sizes && (
+          {selectedProduct.sizes && (
             <View style={styles.sizeContainer}>
               <Text style={styles.sectionTitle}>Select Size</Text>
               <View style={styles.sizeOptions}>
-                {product.sizes.map((size) => (
+                {selectedProduct.sizes.map((size) => (
                   <TouchableOpacity
                     key={size}
                     style={[
@@ -147,7 +189,7 @@ const ProductScreen = ({ route, navigation }) => {
 
           <View style={styles.descriptionContainer}>
             <Text style={styles.sectionTitle}>Description</Text>
-            <Text style={styles.description}>{product.description}</Text>
+            <Text style={styles.description}>{selectedProduct.description}</Text>
           </View>
         </View>
       </ScrollView>
@@ -182,163 +224,61 @@ const ProductScreen = ({ route, navigation }) => {
   );
 };
 
+// Add these new styles
+const additionalStyles = {
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    padding: 16,
   },
-  imageContainer: {
-    width: '100%',
-    height: 300,
-    backgroundColor: '#f5f5f5',
+  cartItem: {
+    padding: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
   },
-  imagePlaceholder: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
+  itemName: {
+    fontSize: 16,
+    fontWeight: '500',
+    marginBottom: 4,
   },
-  infoContainer: {
-    padding: 20,
-  },
-  productName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  priceContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  price: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#007AFF',
-  },
-  originalPrice: {
-    fontSize: 18,
+  itemPrice: {
+    fontSize: 14,
     color: '#666',
-    textDecorationLine: 'line-through',
-    marginLeft: 10,
+    marginBottom: 4,
   },
-  discountBadge: {
-    backgroundColor: '#FFE8E8',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginLeft: 10,
+  itemQuantity: {
+    fontSize: 14,
+    color: '#666',
   },
-  discountText: {
-    color: '#FF4B4B',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 10,
-  },
-  sizeContainer: {
-    marginBottom: 20,
-  },
-  sizeOptions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  sizeButton: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-  },
-  selectedSize: {
-    borderColor: '#007AFF',
+  checkoutButton: {
     backgroundColor: '#007AFF',
-  },
-  sizeText: {
-    fontSize: 16,
-    color: '#666',
-  },
-  selectedSizeText: {
-    color: '#fff',
-  },
-  quantityContainer: {
-    marginBottom: 20,
-  },
-  quantitySelector: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ddd',
+    padding: 15,
     borderRadius: 8,
-    alignSelf: 'flex-start',
-  },
-  quantityButton: {
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-  },
-  quantityText: {
-    fontSize: 18,
-    fontWeight: '600',
-    paddingHorizontal: 20,
-  },
-  descriptionContainer: {
-    marginBottom: 100,
-  },
-  description: {
-    fontSize: 16,
-    lineHeight: 24,
-    color: '#666',
-  },
-  bottomBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-    padding: 20,
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  button: {
-    flex: 1,
-    height: 44,
-    borderRadius: 22,
-    justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 16,
   },
-  wishlistButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 10,
-  },
-  wishlistButtonActive: {
-    backgroundColor: '#FFE8E8',
-  },
-  addToCartButton: {
-    backgroundColor: '#f0f0f0',
-  },
-  buyNowButton: {
-    backgroundColor: '#007AFF',
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#666',
-  },
-  buyNowText: {
+  checkoutButtonText: {
     color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 
