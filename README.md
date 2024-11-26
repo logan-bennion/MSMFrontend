@@ -32,7 +32,7 @@ Backend Setup (Django) Github link: https://github.com/logan-bennion/MSMBackend
    python manage.py migrate
 
 6. Load initial data:
-   python manage.py loaddata apps/products/fixtures/initial_products.json
+   python manage.py loaddata apps/products/fixtures/initial_data.json
    python manage.py loaddata apps/shops/fixtures/initial_data.json
 
 7. Create a superuser (for admin access):
