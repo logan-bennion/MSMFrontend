@@ -13,6 +13,10 @@ import WishlistScreen from './src/screens/WishlistScreen';
 import CartScreen from './src/screens/CartScreen';
 import ProductScreen from './src/screens/ProductScreen';
 import CheckoutScreen from './src/screens/CheckoutScreen';
+import AuthPromptScreen from './src/screens/auth/AuthPromptScreen';
+import SignUpScreen from './src/screens/auth/SignUpScreen';
+import SignInScreen from './src/screens/auth/SignInScreen';
+import ForgotPasswordScreen from './src/screens/auth/ForgotPasswordScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import EditProfileScreen from './src/screens/profile/EditProfileScreen';
 import OrderHistoryScreen from './src/screens/profile/OrderHistoryScreen';
@@ -28,13 +32,15 @@ import AddShippingAddressScreen from './src/screens/profile/AddShippingAddressSc
 import OrderDetailsScreen from './src/screens/profile/OrderDetailsScreen';
 import LeaveReviewScreen from './src/screens/profile/LeaveReviewScreen';
 import TrackOrderScreen from './src/screens/profile/TrackOrderScreen';
+import ShopScreen from './src/screens/ShopScreen';
 
 
 // Import providers
 import { WishlistProvider } from './src/context/WishlistContext';
 import { CartProvider } from './src/context/CartContext';
 import { UserProvider } from './src/context/UserContext';
-import { AuthProvider } from './src/context/AuthContext';
+// import { AuthProvider } from './src/context/AuthContext';
+import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { ProductProvider } from './src/context/ProductContext';
 import { useProducts } from './src/context/ProductContext';
 
@@ -108,9 +114,11 @@ const TabNavigator = () => (
         title: 'Wishlist'
       }}
     />
+    
     <Tab.Screen 
       name="Profile" 
-      component={ProfileScreen}
+      //component={ProfileScreen}
+      component={AuthPromptScreen}
       options={{
         title: 'My Profile'
       }}
@@ -127,6 +135,25 @@ const RootStack = () => {
         name="MainTabs" 
         component={TabNavigator} 
         options={{ headerShown: false }}
+      />
+      <Stack.Screen 
+        name="Shop" 
+        component={ShopScreen}
+        options={({ route }) => ({
+          title: route.params?.shop?.name || 'Shop Details',
+          headerBackTitleVisible: false,
+          headerStyle: {
+            backgroundColor: '#fff',
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 1,
+            borderBottomColor: '#eee',
+          },
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: '600',
+          },
+        })}
       />
       <Stack.Screen 
         name="Product" 
@@ -148,6 +175,49 @@ const RootStack = () => {
         component={CheckoutScreen}
         options={{ headerShown: false }}
       />
+      {/* Add these auth-related screens */}
+        <Stack.Screen 
+        name="Profile" 
+        component={AuthPromptScreen}
+        options={{ 
+          headerShown: false 
+        }}
+        />
+
+        <Stack.Screen 
+        name="SignIn" 
+        component={SignInScreen}
+        options={{ 
+          headerShown: false 
+        }}
+        />
+
+        <Stack.Screen 
+        name="SignUp" 
+        component={SignUpScreen}
+        options={{ 
+          headerShown: false 
+        }}
+        />
+
+        <Stack.Screen 
+          name="ForgotPassword" 
+          component={ForgotPasswordScreen}
+          options={{ 
+          headerShown: false 
+        }}
+        />
+
+    
+    
+        <Stack.Screen 
+          name="MyProfile" 
+          component={ProfileScreen}
+          options={{ 
+          headerShown: false 
+        }}
+        />
+
       {/* Add EditProfile Screen */}
       <Stack.Screen 
         name="EditProfile" 
@@ -432,19 +502,17 @@ const RootStack = () => {
 export default function App() {
   return (
     <AuthProvider>
-    <div>
-      <TestConnection />
-    </div>
       <NavigationContainer>
-        <UserProvider>  {/* Add this */}
+        <UserProvider>
           <WishlistProvider>
             <CartProvider>
               <ProductProvider>
                 <RootStack />
+                <TestConnection />
               </ProductProvider>
             </CartProvider>
           </WishlistProvider>
-        </UserProvider>  {/* Add this */}
+        </UserProvider>
       </NavigationContainer>
     </AuthProvider>
   );

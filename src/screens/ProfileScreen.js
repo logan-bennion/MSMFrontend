@@ -72,7 +72,11 @@ const ProfileScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollViewContent}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Profile Header */}
         <View style={styles.header}>
           <View style={styles.profileImage}>
@@ -108,25 +112,25 @@ const ProfileScreen = ({ navigation }) => {
         </View>
 
         {/* Orders & Shopping */}
-         <SectionHeader title="Orders & Shopping" />
-         <MenuItem 
-            icon="receipt-outline"  // Receipt icon for orders
-            title="Order History"
-            subtitle="View past orders"
-            onPress={() => navigation.navigate('OrderHistory')}
+        <SectionHeader title="Orders & Shopping" />
+        <MenuItem 
+          icon="receipt-outline"
+          title="Order History"
+          subtitle="View past orders"
+          onPress={() => navigation.navigate('OrderHistory')}
         />
-          <MenuItem 
-            icon="location-outline"  // Location/map icon for addresses
-            title="Shipping Addresses"
-            subtitle="View Shipping Addresses"
-            onPress={() => navigation.navigate('Addresses')}  // Note: using 'Addresses' to match the navigation stack
-          />
-<MenuItem 
-  icon="card-outline"  // Credit card icon for payments
-  title="Payment Methods"
-  subtitle="View Payment Methods"
-  onPress={() => navigation.navigate('PaymentMethods')}
-    />
+        <MenuItem 
+          icon="location-outline"
+          title="Shipping Addresses"
+          subtitle="View Shipping Addresses"
+          onPress={() => navigation.navigate('Addresses')}
+        />
+        <MenuItem 
+          icon="card-outline"
+          title="Payment Methods"
+          subtitle="View Payment Methods"
+          onPress={() => navigation.navigate('PaymentMethods')}
+        />
 
         {/* Account Settings */}
         <SectionHeader title="Account Settings" />
@@ -158,25 +162,25 @@ const ProfileScreen = ({ navigation }) => {
         {/* Support & About */}
         <SectionHeader title="Support & About" />
         <MenuItem 
-          icon="help-circle-outline" 
+          icon="help-circle-outline"
           title="Help & Support"
           subtitle="Get assistance and support"
           onPress={() => navigation.navigate('Support')}
         />
         <MenuItem 
-          icon="document-text-outline" 
+          icon="document-text-outline"
           title="Terms & Conditions"
           subtitle="View our terms of service"
           onPress={() => navigation.navigate('Terms')}
         />
         <MenuItem 
-          icon="shield-checkmark-outline" 
+          icon="shield-checkmark-outline"
           title="Privacy Policy"
           subtitle="Learn how we protect your data"
           onPress={() => navigation.navigate('Privacy')}
         />
         <MenuItem 
-          icon="information-circle-outline" 
+          icon="information-circle-outline"
           title="About Us"
           subtitle="Learn more about Main Street Markets"
           onPress={() => navigation.navigate('About')}
@@ -201,6 +205,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollViewContent: {
+    paddingBottom: 80, // Added padding for tab bar
   },
   header: {
     alignItems: 'center',

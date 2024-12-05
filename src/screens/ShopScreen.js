@@ -1,4 +1,3 @@
-// src/screens/ShopScreen.js
 import React, { useState } from 'react';
 import {
   View,
@@ -8,6 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
   SafeAreaView,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import EnhancedImage from '../components/common/EnhancedImage';
@@ -25,16 +25,22 @@ const CategoryButton = ({ title, selected, onPress }) => (
   </TouchableOpacity>
 );
 
-const ProductCard = ({ product, onPress }) => (
-  <TouchableOpacity style={styles.productCard} onPress={onPress}>
+const ListingCard = ({ item, onPress }) => (
+  <TouchableOpacity style={styles.listingCard} onPress={onPress}>
     <EnhancedImage
-      source={product.image}
-      style={styles.productImage}
-      fallbackIcon="image-outline"
+      source={item.image}
+      style={styles.listingImage}
+      fallbackIcon={item.type === 'service' ? 'calendar-outline' : 'image-outline'}
     />
-    <View style={styles.productInfo}>
-      <Text style={styles.productName}>{product.name}</Text>
-      <Text style={styles.productPrice}>${product.price}</Text>
+    <View style={styles.listingInfo}>
+      <Text style={styles.listingName}>{item.name}</Text>
+      <Text style={styles.listingPrice}>
+        ${item.price}
+        {item.type === 'service' && <Text style={styles.priceUnit}>{item.priceUnit}</Text>}
+      </Text>
+      {item.type === 'service' && (
+        <Text style={styles.availability}>Next available: {item.nextAvailable}</Text>
+      )}
     </View>
   </TouchableOpacity>
 );
@@ -43,43 +49,54 @@ const ShopScreen = ({ route, navigation }) => {
   const { shop } = route.params;
   const [selectedCategory, setSelectedCategory] = useState('All');
 
-  // Mock data for shop details
-  const shopDetails = {
+  // Mock data for local business details
+  const businessDetails = {
     ...shop,
-    description: "Your one-stop shop for all electronics needs. We offer the latest gadgets, accessories, and expert advice.",
-    address: "123 Main Street, City, State 12345",
+    description: "Creative Corner Art Studio specializes in custom window paintings, murals, and seasonal decorations for local businesses. Our team of professional artists brings your vision to life.",
+    address: "456 Main Street, Downtown District",
     phone: "(555) 123-4567",
-    hours: "Mon-Sat: 9AM-8PM, Sun: 10AM-6PM",
-    categories: ['All', 'Electronics', 'Accessories', 'Gadgets', 'Smart Home'],
-    products: [
+    email: "create@creativecorner.local",
+    hours: "Tue-Sat: 9AM-6PM, Sun-Mon: By Appointment",
+    website: "www.creativecorner.local",
+    businessType: "Service Provider",
+    categories: ['All', 'Window Painting', 'Murals', 'Seasonal', 'Events'],
+    listings: [
       {
         id: 1,
-        name: 'Wireless Earbuds',
-        price: 79.99,
-        image: 'https://picsum.photos/seed/prod1/400/400',
-        category: 'Electronics'
+        type: 'service',
+        name: 'Holiday Window Painting Package',
+        price: 127.49,
+        priceUnit: '/service',
+        image: 'https://picsum.photos/seed/window1/400/400',
+        category: 'Window Painting',
+        nextAvailable: 'Tomorrow, 2 PM'
       },
       {
         id: 2,
-        name: 'Smart Watch',
-        price: 199.99,
-        image: 'https://picsum.photos/seed/prod2/400/400',
-        category: 'Gadgets'
+        type: 'service',
+        name: 'Custom Business Mural',
+        price: 599.99,
+        priceUnit: '/project',
+        image: 'https://picsum.photos/seed/mural1/400/400',
+        category: 'Murals',
+        nextAvailable: 'Next Week'
       },
       {
         id: 3,
-        name: 'Phone Case',
-        price: 19.99,
-        image: 'https://picsum.photos/seed/prod3/400/400',
-        category: 'Accessories'
+        type: 'service',
+        name: 'Seasonal Window Refresh',
+        price: 89.99,
+        priceUnit: '/service',
+        image: 'https://picsum.photos/seed/seasonal1/400/400',
+        category: 'Seasonal',
+        nextAvailable: 'This Weekend'
       },
-      // Add more products as needed
     ]
   };
 
-  const filteredProducts = selectedCategory === 'All'
-    ? shopDetails.products
-    : shopDetails.products.filter(product => product.category === selectedCategory);
+  const filteredListings = selectedCategory === 'All'
+    ? businessDetails.listings
+    : businessDetails.listings.filter(item => item.category === selectedCategory);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -87,16 +104,18 @@ const ShopScreen = ({ route, navigation }) => {
         {/* Header Image */}
         <View style={styles.header}>
           <EnhancedImage
-            source={shopDetails.image}
+            source={businessDetails.image}
             style={styles.headerImage}
-            fallbackIcon="storefront-outline"
+            fallbackIcon="business-outline"
           />
           <View style={styles.headerOverlay}>
-            <Text style={styles.shopName}>{shopDetails.name}</Text>
+            <Text style={styles.shopName}>{businessDetails.name}</Text>
+            <Text style={styles.businessType}>{businessDetails.businessType}</Text>
             <View style={styles.ratingContainer}>
               <Ionicons name="star" size={16} color="#FFD700" />
-              <Text style={styles.ratingText}>{shopDetails.rating}</Text>
-              <Text style={styles.ratingCount}>(123 reviews)</Text>
+              <Text style={styles.ratingText}>{businessDetails.rating}</Text>
+              <Text style={styles.ratingCount}>({businessDetails.reviewCount} reviews)</Text>
+              <Text style={styles.distance}> • {businessDetails.distance} miles</Text>
             </View>
           </View>
         </View>
@@ -104,37 +123,51 @@ const ShopScreen = ({ route, navigation }) => {
         {/* Quick Actions */}
         <View style={styles.quickActions}>
           <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="call-outline" size={24} color="#007AFF" />
+            <Ionicons name="calendar-outline" size={24} color="#2C5282" />
+            <Text style={styles.actionText}>Book Now</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.actionButton}>
+            <Ionicons name="call-outline" size={24} color="#2C5282" />
             <Text style={styles.actionText}>Call</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="navigate-outline" size={24} color="#007AFF" />
+            <Ionicons name="navigate-outline" size={24} color="#2C5282" />
             <Text style={styles.actionText}>Directions</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="share-outline" size={24} color="#007AFF" />
+            <Ionicons name="share-outline" size={24} color="#2C5282" />
             <Text style={styles.actionText}>Share</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Shop Info */}
+        {/* Business Info */}
         <View style={styles.infoSection}>
           <Text style={styles.sectionTitle}>About</Text>
-          <Text style={styles.description}>{shopDetails.description}</Text>
+          <Text style={styles.description}>{businessDetails.description}</Text>
           
           <View style={styles.infoRow}>
             <Ionicons name="location-outline" size={20} color="#666" />
-            <Text style={styles.infoText}>{shopDetails.address}</Text>
+            <Text style={styles.infoText}>{businessDetails.address}</Text>
           </View>
           
           <View style={styles.infoRow}>
             <Ionicons name="time-outline" size={20} color="#666" />
-            <Text style={styles.infoText}>{shopDetails.hours}</Text>
+            <Text style={styles.infoText}>{businessDetails.hours}</Text>
           </View>
           
           <View style={styles.infoRow}>
             <Ionicons name="call-outline" size={20} color="#666" />
-            <Text style={styles.infoText}>{shopDetails.phone}</Text>
+            <Text style={styles.infoText}>{businessDetails.phone}</Text>
+          </View>
+          
+          <View style={styles.infoRow}>
+            <Ionicons name="mail-outline" size={20} color="#666" />
+            <Text style={styles.infoText}>{businessDetails.email}</Text>
+          </View>
+          
+          <View style={styles.infoRow}>
+            <Ionicons name="globe-outline" size={20} color="#666" />
+            <Text style={styles.infoText}>{businessDetails.website}</Text>
           </View>
         </View>
 
@@ -145,7 +178,7 @@ const ShopScreen = ({ route, navigation }) => {
           style={styles.categoriesContainer}
           contentContainerStyle={styles.categoriesContent}
         >
-          {shopDetails.categories.map((category) => (
+          {businessDetails.categories.map((category) => (
             <CategoryButton
               key={category}
               title={category}
@@ -155,13 +188,16 @@ const ShopScreen = ({ route, navigation }) => {
           ))}
         </ScrollView>
 
-        {/* Products Grid */}
-        <View style={styles.productsGrid}>
-          {filteredProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onPress={() => navigation.navigate('Product', { product })}
+        {/* Listings Grid */}
+        <View style={styles.listingsGrid}>
+          {filteredListings.map((item) => (
+            <ListingCard
+              key={item.id}
+              item={item}
+              onPress={() => navigation.navigate(
+                item.type === 'service' ? 'Service' : 'Product',
+                { item }
+              )}
             />
           ))}
         </View>
@@ -195,6 +231,12 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#fff',
+    marginBottom: 2,
+  },
+  businessType: {
+    fontSize: 14,
+    color: '#fff',
+    opacity: 0.9,
     marginBottom: 5,
   },
   ratingContainer: {
@@ -211,6 +253,10 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     opacity: 0.8,
   },
+  distance: {
+    color: '#fff',
+    opacity: 0.8,
+  },
   quickActions: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -223,7 +269,8 @@ const styles = StyleSheet.create({
   },
   actionText: {
     marginTop: 5,
-    color: '#007AFF',
+    color: '#2C5282',
+    fontSize: 12,
   },
   infoSection: {
     padding: 20,
@@ -232,6 +279,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: '#2C5282',
   },
   description: {
     fontSize: 16,
@@ -242,7 +290,7 @@ const styles = StyleSheet.create({
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 12,
   },
   infoText: {
     marginLeft: 10,
@@ -264,7 +312,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   categoryButtonSelected: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#2C5282',
   },
   categoryButtonText: {
     fontSize: 14,
@@ -273,41 +321,57 @@ const styles = StyleSheet.create({
   categoryButtonTextSelected: {
     color: '#fff',
   },
-  productsGrid: {
+  listingsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     padding: 10,
   },
-  productCard: {
+  listingCard: {
     width: (width - 30) / 2,
     marginHorizontal: 5,
     marginBottom: 15,
     backgroundColor: '#fff',
     borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
   },
-  productImage: {
+  listingImage: {
     width: '100%',
     height: 150,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
   },
-  productInfo: {
+  listingInfo: {
     padding: 10,
   },
-  productName: {
+  listingName: {
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 5,
   },
-  productPrice: {
+  listingPrice: {
     fontSize: 16,
-    color: '#007AFF',
+    color: '#2C5282',
     fontWeight: 'bold',
+  },
+  priceUnit: {
+    fontSize: 12,
+    color: '#666',
+    fontWeight: 'normal',
+  },
+  availability: {
+    fontSize: 12,
+    color: '#4CAF50',
+    marginTop: 4,
   },
 });
 

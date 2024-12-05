@@ -1,4 +1,3 @@
-// src/screens/SearchScreen.js
 import React, { useState } from 'react';
 import {
   View,
@@ -16,42 +15,61 @@ const { width } = Dimensions.get('window');
 
 const CATEGORIES = [
   { id: 'all', name: 'All' },
-  { id: 'electronics', name: 'Electronics' },
-  { id: 'fashion', name: 'Fashion' },
-  { id: 'home', name: 'Home' },
-  { id: 'beauty', name: 'Beauty' },
-  { id: 'food', name: 'Food & Drinks' },
+  { id: 'services', name: 'Services' },
+  { id: 'retail', name: 'Retail' },
+  { id: 'food', name: 'Food & Dining' },
+  { id: 'seasonal', name: 'Seasonal' },
+  { id: 'events', name: 'Events' },
 ];
 
 const PRICE_RANGES = [
   { id: 'all', name: 'All Prices' },
-  { id: 'under25', name: 'Under $25' },
-  { id: '25to50', name: '$ 25 - 50' },
-  { id: '50to100', name: '$ 50 - 100' },
-  { id: 'over100', name: 'Over $100' },
+  { id: 'under50', name: 'Under $50' },
+  { id: '50to100', name: '$50 - $100' },
+  { id: '100to200', name: '$100 - $200' },
+  { id: 'over200', name: 'Over $200' },
 ];
 
 const SORT_OPTIONS = [
   { id: 'relevance', name: 'Relevance' },
+  { id: 'distance', name: 'Distance' },
+  { id: 'rating', name: 'Rating' },
   { id: 'priceLow', name: 'Price: Low to High' },
   { id: 'priceHigh', name: 'Price: High to Low' },
-  { id: 'rating', name: 'Rating' },
 ];
 
-const ProductCard = ({ product, onPress }) => (
+const AVAILABILITY = [
+  { id: 'all', name: 'Any Time' },
+  { id: 'today', name: 'Today' },
+  { id: 'thisWeek', name: 'This Week' },
+  { id: 'thisMonth', name: 'This Month' },
+];
+
+const ListingCard = ({ item, onPress }) => (
   <TouchableOpacity style={styles.productCard} onPress={onPress}>
     <View style={styles.productImage}>
-      <Ionicons name="image-outline" size={40} color="#666" />
+      <Ionicons 
+        name={item.type === 'service' ? 'calendar-outline' : 'image-outline'} 
+        size={40} 
+        color="#666" 
+      />
     </View>
     <View style={styles.productInfo}>
-      <Text style={styles.productName} numberOfLines={2}>{product.name}</Text>
-      <Text style={styles.shopName}>{product.shopName}</Text>
-      <Text style={styles.productPrice}>${product.price.toFixed(2)}</Text>
+      <Text style={styles.productName} numberOfLines={2}>{item.name}</Text>
+      <Text style={styles.shopName}>{item.vendorName}</Text>
+      <Text style={styles.productPrice}>
+        ${item.price.toFixed(2)}
+        {item.type === 'service' && <Text style={styles.priceUnit}>{item.priceUnit}</Text>}
+      </Text>
       <View style={styles.ratingContainer}>
         <Ionicons name="star" size={16} color="#FFD700" />
-        <Text style={styles.ratingText}>{product.rating}</Text>
-        <Text style={styles.reviewCount}>({product.reviews})</Text>
+        <Text style={styles.ratingText}>{item.rating}</Text>
+        <Text style={styles.reviewCount}>({item.reviews})</Text>
+        <Text style={styles.distance}> • {item.distance} mi</Text>
       </View>
+      {item.type === 'service' && item.nextAvailable && (
+        <Text style={styles.availability}>Next available: {item.nextAvailable}</Text>
+      )}
     </View>
   </TouchableOpacity>
 );
@@ -72,39 +90,57 @@ const SearchScreen = ({ navigation }) => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedPriceRange, setSelectedPriceRange] = useState('all');
   const [selectedSort, setSelectedSort] = useState('relevance');
+  const [selectedAvailability, setSelectedAvailability] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
 
-  // Mock data for demonstration
-  const mockProducts = [
+  // Mock data reflecting local businesses and services
+  const mockListings = [
     {
       id: 1,
-      name: 'Wireless Noise-Canceling Headphones',
-      shopName: "Bob's Electronics",
-      price: 199.99,
-      rating: 4.8,
-      reviews: 245,
-      category: 'electronics'
+      type: 'service',
+      name: 'Holiday Window Painting Service',
+      vendorName: "Creative Corner Art Studio",
+      price: 127.49,
+      priceUnit: '/service',
+      rating: 4.9,
+      reviews: 156,
+      distance: 0.3,
+      category: 'services',
+      nextAvailable: 'Tomorrow, 10 AM'
     },
     {
       id: 2,
-      name: 'Handmade Leather Wallet',
-      shopName: "Craft Corner",
-      price: 49.99,
-      rating: 4.6,
-      reviews: 128,
-      category: 'fashion'
+      type: 'product',
+      name: 'Local Organic Thanksgiving Box',
+      vendorName: "Green Valley Farms",
+      price: 169.99,
+      rating: 4.7,
+      reviews: 283,
+      distance: 1.1,
+      category: 'food'
     },
-    // Add more mock products as needed
+    {
+      id: 3,
+      type: 'service',
+      name: 'Professional Snow Removal',
+      vendorName: "Winter Warriors LLC",
+      price: 299.99,
+      priceUnit: '/season',
+      rating: 4.8,
+      reviews: 178,
+      distance: 0.8,
+      category: 'seasonal',
+      nextAvailable: 'Seasonal booking'
+    }
   ];
 
-  const filteredProducts = mockProducts.filter(product => {
-    if (searchQuery && !product.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+  const filteredListings = mockListings.filter(item => {
+    if (searchQuery && !item.name.toLowerCase().includes(searchQuery.toLowerCase())) {
       return false;
     }
-    if (selectedCategory !== 'all' && product.category !== selectedCategory) {
+    if (selectedCategory !== 'all' && item.category !== selectedCategory) {
       return false;
     }
-    // Add price range filtering logic here
     return true;
   });
 
@@ -116,7 +152,7 @@ const SearchScreen = ({ navigation }) => {
           <Ionicons name="search-outline" size={20} color="#666" />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search products, shops, and categories"
+            placeholder="Search local businesses and services"
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -130,7 +166,7 @@ const SearchScreen = ({ navigation }) => {
           style={styles.filterButton}
           onPress={() => setShowFilters(!showFilters)}
         >
-          <Ionicons name="options-outline" size={24} color="#007AFF" />
+          <Ionicons name="options-outline" size={24} color="#2C5282" />
         </TouchableOpacity>
       </View>
 
@@ -161,6 +197,18 @@ const SearchScreen = ({ navigation }) => {
             ))}
           </ScrollView>
 
+          <Text style={styles.filterTitle}>Availability</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {AVAILABILITY.map(option => (
+              <FilterChip
+                key={option.id}
+                label={option.name}
+                selected={selectedAvailability === option.id}
+                onPress={() => setSelectedAvailability(option.id)}
+              />
+            ))}
+          </ScrollView>
+
           <Text style={styles.filterTitle}>Sort By</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {SORT_OPTIONS.map(option => (
@@ -178,11 +226,14 @@ const SearchScreen = ({ navigation }) => {
       {/* Results */}
       <ScrollView style={styles.resultsContainer}>
         <View style={styles.resultsGrid}>
-          {filteredProducts.map(product => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onPress={() => navigation.navigate('Product', { product })}
+          {filteredListings.map(item => (
+            <ListingCard
+              key={item.id}
+              item={item}
+              onPress={() => navigation.navigate(
+                item.type === 'service' ? 'Service' : 'Product', 
+                { item }
+              )}
             />
           ))}
         </View>
@@ -227,6 +278,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginVertical: 10,
+    color: '#2C5282',
   },
   filterChip: {
     paddingHorizontal: 15,
@@ -237,7 +289,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   selectedFilterChip: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#2C5282',
   },
   filterChipText: {
     color: '#666',
@@ -281,6 +333,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 4,
+    height: 36,
   },
   shopName: {
     fontSize: 12,
@@ -290,12 +343,18 @@ const styles = StyleSheet.create({
   productPrice: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#007AFF',
+    color: '#2C5282',
     marginBottom: 4,
+  },
+  priceUnit: {
+    fontSize: 12,
+    color: '#666',
+    fontWeight: 'normal',
   },
   ratingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 4,
   },
   ratingText: {
     marginLeft: 4,
@@ -307,6 +366,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
   },
+  distance: {
+    fontSize: 12,
+    color: '#666',
+  },
+  availability: {
+    fontSize: 12,
+    color: '#4CAF50',
+    fontWeight: '500',
+  }
 });
 
 export default SearchScreen;

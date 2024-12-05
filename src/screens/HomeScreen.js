@@ -115,70 +115,99 @@ const HomeScreen = ({ navigation }) => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [loading, setLoading] = useState(false);
 
-  const categories = ['All', 'Electronics', 'Fashion', 'Food', 'Home', 'Beauty'];
+  const categories = [
+    'All', 
+    'Services', 
+    'Food & Dining', 
+    'Retail', 
+    'Seasonal', 
+    'Events'
+  ];
 
   const featuredShops = [
     {
       id: 1,
-      name: "Bob's Electronics",
-      category: 'Electronics',
-      rating: 4.8,
-      reviewCount: 254,
-      distance: 0.8,
-      image: 'https://picsum.photos/seed/shop1/400/300',
-      isOpen: true
+      name: "Creative Corner Art Studio",
+      category: 'Services',
+      rating: 4.9,
+      reviewCount: 156,
+      distance: 0.3,
+      image: 'https://picsum.photos/seed/creative/400/300',
+      isOpen: true,
+      description: "Creative Corner Art Studio specializes in custom window paintings, murals, and seasonal decorations for local businesses.",
+      address: "456 Main Street, Downtown District",
+      phone: "(555) 123-4567",
+      email: "create@creativecorner.local",
+      hours: "Tue-Sat: 9AM-6PM, Sun-Mon: By Appointment",
+      website: "www.creativecorner.local",
+      businessType: "Service Provider"
     },
     {
       id: 2,
-      name: "Mary's Boutique",
-      category: 'Fashion',
-      rating: 4.6,
-      reviewCount: 187,
-      distance: 1.2,
-      image: 'https://picsum.photos/seed/shop2/400/300',
-      isOpen: true
+      name: "Green Valley Farms Market",
+      category: 'Food & Dining',
+      rating: 4.7,
+      reviewCount: 283,
+      distance: 1.1,
+      image: 'https://picsum.photos/seed/farm/400/300',
+      isOpen: true,
+      description: "Local organic produce and farm-fresh goods directly from local farmers.",
+      address: "789 Market Street, Farmers District",
+      phone: "(555) 234-5678",
+      email: "info@greenvalleyfarms.local",
+      hours: "Mon-Sun: 8AM-8PM",
+      website: "www.greenvalleyfarms.local",
+      businessType: "Food Market"
     },
     {
       id: 3,
-      name: "Local Crafts Co.",
-      category: 'Home',
-      rating: 4.9,
-      reviewCount: 432,
+      name: "Main Street Collective",
+      category: 'Retail',
+      rating: 4.8,
+      reviewCount: 197,
       distance: 0.5,
-      image: 'https://picsum.photos/seed/shop3/400/300',
-      isOpen: false
+      image: 'https://picsum.photos/seed/collective/400/300',
+      isOpen: false,
+      description: "A curated collection of local artisan products and handcrafted goods.",
+      address: "321 Main Street, Arts District",
+      phone: "(555) 345-6789",
+      email: "hello@mainstreetcollective.local",
+      hours: "Tue-Sun: 10AM-7PM, Mon: Closed",
+      website: "www.mainstreetcollective.local",
+      businessType: "Retail Store"
     },
   ];
 
   const deals = [
     {
       id: 1,
-      name: 'Wireless Noise-Canceling Earbuds with Charging Case',
-      shopName: "Bob's Electronics",
-      price: 79.99,
-      originalPrice: 129.99,
-      image: 'https://picsum.photos/seed/deal1/400/400',
-      stock: 5
+      name: 'Holiday Window Painting Service',
+      shopName: "Creative Corner Art Studio",
+      price: 127.49,
+      originalPrice: 149.99,
+      image: 'https://picsum.photos/seed/window/400/400',
+      stock: 8
     },
     {
       id: 2,
-      name: 'Handmade Wool Scarf - Winter Collection',
-      shopName: "Mary's Boutique",
-      price: 24.99,
-      originalPrice: 39.99,
-      image: 'https://picsum.photos/seed/deal2/400/400',
-      stock: 12
+      name: 'Local Organic Thanksgiving Box',
+      shopName: "Green Valley Farms",
+      price: 169.99,
+      originalPrice: 189.99,
+      image: 'https://picsum.photos/seed/thanksgiving/400/400',
+      stock: 15
     },
     {
       id: 3,
-      name: 'Organic Coffee Beans - Local Roast',
-      shopName: "Local Crafts Co.",
-      price: 14.99,
-      originalPrice: 19.99,
-      image: 'https://picsum.photos/seed/deal3/400/400',
-      stock: 8
+      name: 'Local Artisan Gift Basket',
+      shopName: "Main Street Collective",
+      price: 69.99,
+      originalPrice: 79.99,
+      image: 'https://picsum.photos/seed/gift/400/400',
+      stock: 20
     },
   ];
+  
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -186,7 +215,12 @@ const HomeScreen = ({ navigation }) => {
     setTimeout(() => {
       setRefreshing(false);
     }, 2000);
-  }, []);
+  }, 
+  
+  
+
+  []);
+  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -196,20 +230,20 @@ const HomeScreen = ({ navigation }) => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {/* Hero Banner */}
+        {/* Updated Hero Banner */}
         <LinearGradient
-          colors={['#007AFF', '#00BFFF']}
+          colors={['#2C5282', '#4299E1']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.heroBanner}
         >
-          <Text style={styles.heroTitle}>Support Local</Text>
-          <Text style={styles.heroSubtitle}>Discover amazing shops in your area</Text>
+          <Text style={styles.heroTitle}>Shop Local, Support Local</Text>
+          <Text style={styles.heroSubtitle}>Discover the best of Main Street in your area</Text>
           <TouchableOpacity 
             style={styles.heroButton}
             onPress={() => navigation.navigate('Search')}
           >
-            <Text style={styles.heroButtonText}>Explore Now</Text>
+            <Text style={styles.heroButtonText}>Explore Local Shops</Text>
           </TouchableOpacity>
         </LinearGradient>
 
@@ -229,16 +263,16 @@ const HomeScreen = ({ navigation }) => {
           ))}
         </ScrollView>
 
-        {/* Featured Shops */}
+        {/* Featured Local Businesses */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Featured Shops</Text>
+            <Text style={styles.sectionTitle}>Featured Local Businesses</Text>
             <TouchableOpacity onPress={() => navigation.navigate('Search', { screen: 'Shops' })}>
               <Text style={styles.seeAllButton}>See All</Text>
             </TouchableOpacity>
           </View>
           {loading ? (
-            <ActivityIndicator size="large" color="#007AFF" />
+            <ActivityIndicator size="large" color="#2C5282" />
           ) : (
             <ScrollView 
               horizontal 
@@ -247,41 +281,41 @@ const HomeScreen = ({ navigation }) => {
             >
               {featuredShops.map(shop => (
                 <ShopCard 
-                  key={shop.id} 
-                  shop={shop} 
-                  onPress={() => navigation.navigate('Shop', { shop })}
+                 key={shop.id} 
+                 shop={shop} 
+                 onPress={() => navigation.navigate('Shop', { shop })}
                 />
               ))}
             </ScrollView>
           )}
         </View>
 
-        {/* Today's Deals */}
+        {/* Local Deals & Services */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Today's Deals</Text>
+            <Text style={styles.sectionTitle}>Local Deals & Services</Text>
             <TouchableOpacity onPress={() => navigation.navigate('Search', { screen: 'Deals' })}>
               <Text style={styles.seeAllButton}>See All</Text>
             </TouchableOpacity>
           </View>
           {loading ? (
-            <ActivityIndicator size="large" color="#007AFF" />
+            <ActivityIndicator size="large" color="#2C5282" />
           ) : (
             <ScrollView 
               horizontal 
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.dealsContainer}
             >
-            {deals.map(deal => (
-              <DealCard 
-                key={deal.id} 
-                deal={deal} 
-                onPress={() => navigation.navigate('Product', { 
-                  productId: deal.id,    // Changed from id to deal.id
-                  title: deal.name       // Changed from name to deal.name
-                })}
-              />
-            ))}
+              {deals.map(deal => (
+                <DealCard 
+                  key={deal.id} 
+                  deal={deal} 
+                  onPress={() => navigation.navigate('Product', { 
+                    productId: deal.id,
+                    title: deal.name
+                  })}
+                />
+              ))}
             </ScrollView>
           )}
         </View>
@@ -543,6 +577,42 @@ const styles = StyleSheet.create({
       fontSize: 12,
       marginTop: 5,
       fontWeight: '500',
+    },
+    heroButton: {
+      backgroundColor: '#fff',
+      paddingVertical: 12,
+      paddingHorizontal: 24,
+      borderRadius: 25,
+      alignSelf: 'flex-start',
+      ...Platform.select({
+        ios: {
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.2,
+          shadowRadius: 4,
+        },
+        android: {
+          elevation: 4,
+        },
+      }),
+    },
+    heroButtonText: {
+      color: '#2C5282',
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    categoryButtonSelected: {
+      backgroundColor: '#2C5282',
+    },
+    seeAllButton: {
+      color: '#2C5282',
+      fontSize: 16,
+    },
+    dealPrice: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: '#2C5282',
+      marginRight: 8,
     },
   });
 
